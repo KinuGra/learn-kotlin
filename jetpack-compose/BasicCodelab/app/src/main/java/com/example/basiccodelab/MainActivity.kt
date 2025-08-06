@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,8 @@ import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.basiccodelab.ui.theme.BasicCodelabTheme
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.saveable.rememberSaveable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
-    var shouldShowOnboarding by remember { mutableStateOf(true) }
+    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
 
     Surface(modifier) {
         if (shouldShowOnboarding) {
@@ -56,10 +59,10 @@ fun MyApp(modifier: Modifier = Modifier) {
 @Composable
 private fun Greetings(
     modifier: Modifier = Modifier,
-    names: List<String> = listOf("World", "Compose")
+    names: List<String> = List(1000) { "$it" }
 ) {
-    Column(modifier = modifier.padding(vertical = 4.dp)) {
-        for (name in names) {
+    LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
+        items(items = names) { name ->
             Greeting(name = name)
         }
     }
@@ -67,7 +70,7 @@ private fun Greetings(
 
 @Composable
 fun Greeting(name: String) {
-    var expanded = remember { mutableStateOf(false) }
+    var expanded = rememberSaveable { mutableStateOf(false) }
     val extraPadding = if (expanded.value) 48.dp else 0.dp
 
     // Surface 内にネストされているコンポーネントは、その背景色の上に描画されます。
@@ -97,9 +100,6 @@ fun OnboardingScreen(
     onContinueClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // TODO: This state should be hoisted
-    var shouldShowOnboarding by remember { mutableStateOf(true) }
-
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -146,3 +146,22 @@ fun GreetingsPreview() {
         Greetings()
     }
 }
+
+/* memo
+
+アノテーションとは？
+アノテーションとは、プログラムの構成要素（クラス・関数・変数など）にメタ情報（補足情報）を付加する仕組みです。
+@Composable	Jetpack Compose におけるUI関数の印付け
+@Inject	DI（依存性注入）用（Dagger/Hilt）
+
+-> について
+-> は Kotlin における ラムダ式（無名関数）の記号で、
+「引数」から「処理本体」への流れ を表します。
+{ 引数 -> 処理 }
+例	意味・用途
+{ it -> println(it) }	1つの引数 it を使って出力
+val greet = { name: String -> "Hello $name" }
+println(greet("Kotlin"))
+// → Hello Kotlin
+
+ */
