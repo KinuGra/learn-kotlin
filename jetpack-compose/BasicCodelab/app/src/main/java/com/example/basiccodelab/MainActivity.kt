@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -34,7 +35,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.basiccodelab.ui.theme.BasicCodelabTheme
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 
 class MainActivity : ComponentActivity() {
@@ -52,11 +62,21 @@ class MainActivity : ComponentActivity() {
 fun MyApp(modifier: Modifier = Modifier) {
     var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
 
-    Surface(modifier) {
-        if (shouldShowOnboarding) {
-            OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
-        } else {
-            Greetings()
+    /*
+    自作のテーマ BasicCodelabTheme を適用。
+    darkTheme = false にしてライトモードを明示的に適用。
+    dynamicColor = false で Android 12以降の動的カラー（Material You）を無効化。
+     */
+    BasicCodelabTheme(
+        darkTheme = false, // ライトモード、ダークモードの切替可能
+        dynamicColor = false
+    ) {
+        Surface(modifier, color = MaterialTheme.colorScheme.background) {
+            if (shouldShowOnboarding) {
+                OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
+            } else {
+                Greetings()
+            }
         }
     }
 }
@@ -74,44 +94,101 @@ private fun Greetings(
 }
 
 @Composable
-fun Greeting(name: String) {
-    var expanded = rememberSaveable { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (expanded.value) 48.dp else 0.dp,
-
-        // 動きの性質を指定：springでばねのような挙動を作る
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
-    // Surface 内にネストされているコンポーネントは、その背景色の上に描画されます。
-    Surface(
-        color = MaterialTheme.colorScheme.primary,
+private fun Greeting(name: String) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Row(modifier = Modifier.padding(24.dp)) {
-            Column(modifier = Modifier
+        CardContent(name)
+    }
+}
+
+@Composable
+private fun CardContent(name: String) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .padding(12.dp)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier
                 .weight(1f)
-                .padding(bottom = extraPadding.coerceAtLeast(0.dp)) // 下限を0.dpに制限
-            ) {
-                Text(text = "Hello ")
+                .padding(12.dp)
+        ) {
+            Text(text = "Hello, ")
+            Text(
+                text = name, style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
+            if (expanded) {
                 Text(
-                    text = name,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    )
+                    text = ("Composem ipsum color sit lazy, " +
+                            "padding theme elit, sed do bouncy. ").repeat(4),
                 )
             }
-            ElevatedButton(
-                onClick = { expanded.value = !expanded.value }
-            ) {
-                Text(if (expanded.value) "Show less" else "Show more")
-            }
+        }
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(
+                imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                contentDescription = if (expanded) {
+                    stringResource(R.string.show_less)
+                } else {
+                    stringResource(R.string.show_more)
+                }
+            )
         }
     }
 }
+
+//@Composable
+//private fun Greeting(name: String) {
+//    var expanded = rememberSaveable { mutableStateOf(false) }
+//    val extraPadding by animateDpAsState(
+//        if (expanded.value) 48.dp else 0.dp,
+//
+//        // 動きの性質を指定：springでばねのような挙動を作る
+//        animationSpec = spring(
+//            dampingRatio = Spring.DampingRatioMediumBouncy,
+//            stiffness = Spring.StiffnessLow
+//        )
+//    )
+//
+//    // Surface 内にネストされているコンポーネントは、その背景色の上に描画されます。
+//    Surface(
+//        color = MaterialTheme.colorScheme.primary,
+//        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+//    ) {
+//        Row(modifier = Modifier.padding(24.dp)) {
+//            Column(modifier = Modifier
+//                .weight(1f)
+//                .padding(bottom = extraPadding.coerceAtLeast(0.dp)) // 下限を0.dpに制限
+//            ) {
+//                Text(text = "Hello ")
+//                Text(
+//                    text = name,
+//                    style = MaterialTheme.typography.headlineMedium.copy(
+//                        fontWeight = FontWeight.ExtraBold
+//                    )
+//                )
+//            }
+//            ElevatedButton(
+//                onClick = { expanded.value = !expanded.value }
+//            ) {
+//                Text(if (expanded.value) "Show less" else "Show more")
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun OnboardingScreen(
