@@ -10,6 +10,24 @@ class Test() {
     }
 }
 
+class Person(val name: String, var age: Int)
+
+// 親クラス
+open class Animal { // openで継承を許可
+    open fun sound1() {
+        println("Animal sound1")
+    }
+    open fun sound2() {
+        println("Animal sound2")
+    }
+}
+// Animalクラスを継承した子クラス
+class Dog: Animal() {
+    override fun sound2() { // 親クラスのメソッドをオーバーライド
+        println("Hello")
+    }
+}
+
 fun main() {
     // 標準出力
     println(hoge)
@@ -44,6 +62,13 @@ fun main() {
     val a2 = Test()
     a2.name = "Taro"
     println("a1: ${a1.name}, a2: ${a2.name}")
+
+    // インスタンス生成
+    val person = Person("Alice", 20)
+    println(person.name + person.age)
+    val dog = Dog()
+    dog.sound1()
+    dog.sound2()
 }
 
 // 関数
