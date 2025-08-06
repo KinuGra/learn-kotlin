@@ -1,10 +1,14 @@
 package com.example.basiccodelab
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.example.basiccodelab.ui.theme.BasicCodelabTheme
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.text.font.FontWeight
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +76,15 @@ private fun Greetings(
 @Composable
 fun Greeting(name: String) {
     var expanded = rememberSaveable { mutableStateOf(false) }
-    val extraPadding = if (expanded.value) 48.dp else 0.dp
+    val extraPadding by animateDpAsState(
+        if (expanded.value) 48.dp else 0.dp,
+
+        // 動きの性質を指定：springでばねのような挙動を作る
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
 
     // Surface 内にネストされているコンポーネントは、その背景色の上に描画されます。
     Surface(
@@ -81,10 +94,15 @@ fun Greeting(name: String) {
         Row(modifier = Modifier.padding(24.dp)) {
             Column(modifier = Modifier
                 .weight(1f)
-                .padding(bottom = extraPadding)
+                .padding(bottom = extraPadding.coerceAtLeast(0.dp)) // 下限を0.dpに制限
             ) {
                 Text(text = "Hello ")
-                Text(text = name)
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                )
             }
             ElevatedButton(
                 onClick = { expanded.value = !expanded.value }
@@ -123,7 +141,12 @@ fun MyAppPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 320)
+@Preview(
+    showBackground = true,
+    widthDp = 320,
+    uiMode = UI_MODE_NIGHT_YES,
+    name = "GreetingPreviewDark"
+    )
 @Composable
 fun GreetingPreview() {
     BasicCodelabTheme {
