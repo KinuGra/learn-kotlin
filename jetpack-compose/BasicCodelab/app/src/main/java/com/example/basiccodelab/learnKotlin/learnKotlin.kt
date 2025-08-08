@@ -1,4 +1,4 @@
-package com.example.basiccodelab
+package com.example.basiccodelab.learnKotlin
 
 var hoge: Int = 100
 
