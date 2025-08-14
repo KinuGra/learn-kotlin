@@ -35,5 +35,7 @@ fun HomeScreen() {
         Button(onClick = { count++ }) {
             Text("Add")
         }
+
+        HomeCardText("これはHomeComponentsから読んだText")
     }
 }
