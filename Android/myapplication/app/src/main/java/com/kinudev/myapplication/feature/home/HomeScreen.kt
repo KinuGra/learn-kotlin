@@ -1,5 +1,6 @@
 package com.kinudev.myapplication.feature.home
 
+import android.provider.ContactsContract.Profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onGoProfile: () -> Unit
+) {
     var count by remember { mutableStateOf(0) }
 
     Column(
@@ -37,5 +40,9 @@ fun HomeScreen() {
         }
 
         HomeCardText("これはHomeComponentsから読んだText")
+
+        Button(onClick = onGoProfile) {
+            Text("Go To Profile")
+        }
     }
 }

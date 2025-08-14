@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 
 fun NavGraphBuilder.homeNavGraph(navController: NavController) {
     composable(route = "home") {
-        HomeScreen()
+        HomeScreen(
+            onGoProfile = {navController.navigate("profile")}
+        )
     }
 }
